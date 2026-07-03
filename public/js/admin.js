@@ -49,21 +49,21 @@ async function loadAdminIssues() {
             if (issue.status === 'Fixed') statusBadgeClass = 'badge-success';
 
             tr.innerHTML = `
-                <td>${dateStr}</td>
-                <td>${locationHtml}</td>
-                <td><strong>${issue.type}</strong></td>
-                <td>
+                <td data-label="Date">${dateStr}</td>
+                <td data-label="Location">${locationHtml}</td>
+                <td data-label="Type"><strong>${issue.type}</strong></td>
+                <td data-label="Description">
                     ${issue.description}
-                    <div style="margin-top: 0.5rem;">
+                    <div style="margin-top: 0.5rem; display: flex; justify-content: inherit;">
                         <span style="background: #f0fdf4; color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: bold;">
                             👍 ${issue.upvotes || 0} Upvotes
                         </span>
                     </div>
                 </td>
-                <td>${photoHtml}</td>
-                <td><span class="badge ${statusBadgeClass}" id="status-badge-${issue._id}">${issue.status}</span></td>
-                <td>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <td data-label="Photo">${photoHtml}</td>
+                <td data-label="Status"><span class="badge ${statusBadgeClass}" id="status-badge-${issue._id}">${issue.status}</span></td>
+                <td data-label="Action">
+                    <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: inherit;">
                         <select class="form-control status-select" onchange="updateStatus('${issue._id}', this.value)">
                             <option value="New" ${issue.status === 'New' ? 'selected' : ''}>New</option>
                             <option value="In Progress" ${issue.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
