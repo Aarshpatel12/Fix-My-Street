@@ -10,6 +10,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+const markersLayer = L.layerGroup().addTo(map);
+let allIssues = [];
+
 // Try to get user's actual location and watch it in real-time
 let userMarker = null;
 let userCircle = null;
@@ -106,45 +109,60 @@ function getIconByStatus(status) {
 async function loadIssues() {
     try {
         const response = await fetch('/api/issues');
-        const issues = await response.json();
-        
-        issues.forEach(issue => {
-            const marker = L.marker([issue.lat, issue.lng], {
-                icon: getIconByStatus(issue.status)
-            }).addTo(map);
-            
-            const photoHtml = issue.photoUrl ? `<img src="${issue.photoUrl}" alt="Issue Photo" style="max-width: 100%; margin-bottom: 10px;">` : '';
-            const date = new Date(issue.createdAt).toLocaleDateString();
-            const badgeClass = issue.status === 'New' ? 'badge-danger' : issue.status === 'In Progress' ? 'badge-warning' : 'badge-success';
-
-            const hasUpvoted = localStorage.getItem('upvoted_' + issue._id) === 'true';
-            const upvoteBtnText = hasUpvoted ? 'Upvoted ✓' : 'Me Too!';
-            const upvoteBtnDisabled = hasUpvoted ? 'disabled' : '';
-
-            const popupContent = `
-                <div style="min-width: 200px;">
-                    <h3 style="margin:0 0 5px 0; color:var(--primary)">${issue.type}</h3>
-                    <p style="margin:0 0 10px 0; font-size:14px;">${issue.description}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span style="font-size:12px; color:#666;">${date}</span>
-                        <span class="badge ${badgeClass}">${issue.status}</span>
-                    </div>
-                    ${photoHtml}
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                        <span style="font-weight: bold; color: var(--primary);" id="upvote-count-${issue._id}">👍 ${issue.upvotes || 0}</span>
-                        <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="upvoteIssue('${issue._id}')" id="btn-upvote-${issue._id}" ${upvoteBtnDisabled}>${upvoteBtnText}</button>
-                    </div>
-                </div>
-            `;
-            
-            marker.bindPopup(popupContent, {
-                minWidth: 250,
-                maxWidth: 300,
-            });
-        });
+        allIssues = await response.json();
+        applyFilters();
     } catch (err) {
-        console.error("Error loading issues:", err);
+        console.error('Error loading issues:', err);
     }
+}
+
+// Apply selected filters and re-render markers
+window.applyFilters = function() {
+    markersLayer.clearLayers();
+    
+    const statusFilter = document.getElementById('filterStatus').value;
+    const typeFilter = document.getElementById('filterType').value;
+
+    const filtered = allIssues.filter(issue => {
+        const matchStatus = statusFilter === 'All' || issue.status === statusFilter;
+        const matchType = typeFilter === 'All' || issue.type === typeFilter;
+        return matchStatus && matchType;
+    });
+
+    filtered.forEach(issue => {
+        const marker = L.marker([issue.lat, issue.lng], {
+            icon: getIconByStatus(issue.status)
+        }).addTo(markersLayer);
+        
+        const photoHtml = issue.photoUrl ? `<img src="${issue.photoUrl}" alt="Issue Photo" style="max-width: 100%; margin-bottom: 10px;">` : '';
+        const date = new Date(issue.createdAt).toLocaleDateString();
+        const badgeClass = issue.status === 'New' ? 'badge-danger' : issue.status === 'In Progress' ? 'badge-warning' : 'badge-success';
+
+        const hasUpvoted = localStorage.getItem('upvoted_' + issue._id) === 'true';
+        const upvoteBtnText = hasUpvoted ? 'Upvoted ✓' : 'Me Too!';
+        const upvoteBtnDisabled = hasUpvoted ? 'disabled' : '';
+
+        const popupContent = `
+            <div style="min-width: 200px;">
+                <h3 style="margin:0 0 5px 0; color:var(--primary)">${issue.type}</h3>
+                <p style="margin:0 0 10px 0; font-size:14px;">${issue.description}</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:12px; color:#666;">${date}</span>
+                    <span class="badge ${badgeClass}">${issue.status}</span>
+                </div>
+                ${photoHtml}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <span style="font-weight: bold; color: var(--primary);" id="upvote-count-${issue._id}">👍 ${issue.upvotes || 0}</span>
+                    <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="upvoteIssue('${issue._id}')" id="btn-upvote-${issue._id}" ${upvoteBtnDisabled}>${upvoteBtnText}</button>
+                </div>
+            </div>
+        `;
+        
+        marker.bindPopup(popupContent, {
+            minWidth: 250,
+            maxWidth: 300
+        });
+    });
 }
 
 // Load issues when map is ready

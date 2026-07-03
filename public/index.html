@@ -22,7 +22,33 @@
     </header>
 
     <main>
-        <div id="map"></div>
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Filter Panel Overlay -->
+    <div class="filter-panel" id="filterPanel">
+        <h4>Filter Issues</h4>
+        <div class="filter-group">
+            <label>Status</label>
+            <select id="filterStatus" class="form-control" onchange="applyFilters()">
+                <option value="All">All Statuses</option>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Fixed">Fixed</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Category</label>
+            <select id="filterType" class="form-control" onchange="applyFilters()">
+                <option value="All">All Categories</option>
+                <option value="Pothole">Pothole</option>
+                <option value="Streetlight">Streetlight</option>
+                <option value="Garbage">Garbage</option>
+                <option value="Water Leak">Water Leak</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
     </main>
 
     <!-- Leaflet JS -->
