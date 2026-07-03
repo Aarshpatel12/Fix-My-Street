@@ -378,3 +378,13 @@ async function submitIssue(event, lat, lng) {
         alert('Network error. Please try again.');
     }
 }
+
+// Find My Location Button Logic
+document.getElementById('btn-locate').addEventListener('click', () => {
+    if (userMarker) {
+        map.setView(userMarker.getLatLng(), 16);
+    } else {
+        // If marker doesn't exist yet, trigger locate
+        map.locate({setView: true, maxZoom: 16});
+    }
+});
