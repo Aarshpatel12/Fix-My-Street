@@ -1,0 +1,128 @@
+// Load issues from server
+async function loadAdminIssues() {
+    // Check Authentication
+    if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+        window.location.href = '/login.html';
+        return; // Stop execution
+    }
+
+    try {
+        const response = await fetch('/api/issues');
+        const issues = await response.json();
+        
+        const tableBody = document.getElementById('issuesTableBody');
+        tableBody.innerHTML = ''; // Clear table
+        
+        issues.forEach(issue => {
+            const tr = document.createElement('tr');
+            
+            // Format date
+            const dateStr = new Date(issue.createdAt).toLocaleDateString();
+            
+            // Create a small thumbnail if photo exists
+            const photoHtml = issue.photoUrl 
+                ? `<img src="${issue.photoUrl}" alt="Photo" class="thumbnail" onclick="window.open('${issue.photoUrl}', '_blank')">` 
+                : `<span class="text-muted">No photo</span>`;
+            
+            // Format location with Google Maps link
+            const latLngStr = `${issue.lat.toFixed(5)}, ${issue.lng.toFixed(5)}`;
+            const mapLink = `https://www.google.com/maps?q=${issue.lat},${issue.lng}`;
+            const locationHtml = `
+                <div>${latLngStr}</div>
+                <a href="${mapLink}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: none;">View on Maps</a>
+            `;
+
+            // Status badge class
+            let statusBadgeClass = 'badge-danger'; // New
+            if (issue.status === 'In Progress') statusBadgeClass = 'badge-warning';
+            if (issue.status === 'Fixed') statusBadgeClass = 'badge-success';
+
+            tr.innerHTML = `
+                <td>${dateStr}</td>
+                <td>${locationHtml}</td>
+                <td><strong>${issue.type}</strong></td>
+                <td>${issue.description}</td>
+                <td>${photoHtml}</td>
+                <td><span class="badge ${statusBadgeClass}" id="status-badge-${issue._id}">${issue.status}</span></td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <select class="form-control status-select" onchange="updateStatus('${issue._id}', this.value)">
+                            <option value="New" ${issue.status === 'New' ? 'selected' : ''}>New</option>
+                            <option value="In Progress" ${issue.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Fixed" ${issue.status === 'Fixed' ? 'selected' : ''}>Fixed</option>
+                        </select>
+                        <button class="btn-outline" style="color: var(--danger); border-color: var(--danger); padding: 0.5rem; font-size: 0.75rem; cursor: pointer;" onclick="deleteIssue('${issue._id}')">Delete</button>
+                    </div>
+                </td>
+            `;
+            
+            tableBody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Error loading issues for admin:", err);
+        alert("Failed to load issues.");
+    }
+}
+
+// Update issue status
+async function updateStatus(id, newStatus) {
+    try {
+        const response = await fetch(`/api/issues/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        
+        if (response.ok) {
+            // Update the badge in the UI
+            const badge = document.getElementById(`status-badge-${id}`);
+            badge.textContent = newStatus;
+            
+            // Update badge class
+            badge.className = 'badge';
+            if (newStatus === 'New') badge.classList.add('badge-danger');
+            if (newStatus === 'In Progress') badge.classList.add('badge-warning');
+            if (newStatus === 'Fixed') badge.classList.add('badge-success');
+            
+            // Use subtle notification instead of alert for better UX
+            console.log(`Status updated to ${newStatus}`);
+        } else {
+            alert('Failed to update status in database.');
+        }
+    } catch (err) {
+        console.error('Error updating status:', err);
+        alert('Network error. Please try again.');
+    }
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', loadAdminIssues);
+
+// Delete issue
+async function deleteIssue(id) {
+    if (!confirm('Are you sure you want to delete this issue? This action cannot be undone.')) return;
+
+    try {
+        const response = await fetch(`/api/issues/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            console.log('Issue deleted');
+            loadAdminIssues(); // Refresh the table
+        } else {
+            alert('Failed to delete issue from database.');
+        }
+    } catch (err) {
+        console.error('Error deleting issue:', err);
+        alert('Network error. Please try again.');
+    }
+}
+
+// Logout Admin
+function logoutAdmin() {
+    sessionStorage.removeItem('isAdminLoggedIn');
+    window.location.href = '/login.html';
+}
