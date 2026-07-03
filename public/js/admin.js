@@ -13,6 +13,17 @@ async function loadAdminIssues() {
         const tableBody = document.getElementById('issuesTableBody');
         tableBody.innerHTML = ''; // Clear table
         
+        // Calculate Stats
+        const total = issues.length;
+        const newIssues = issues.filter(i => i.status === 'New').length;
+        const inProgress = issues.filter(i => i.status === 'In Progress').length;
+        const fixed = issues.filter(i => i.status === 'Fixed').length;
+
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-new').innerText = newIssues;
+        document.getElementById('stat-progress').innerText = inProgress;
+        document.getElementById('stat-fixed').innerText = fixed;
+
         issues.forEach(issue => {
             const tr = document.createElement('tr');
             
