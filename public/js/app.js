@@ -113,18 +113,26 @@ async function loadIssues() {
                 icon: getIconByStatus(issue.status)
             }).addTo(map);
             
-            const photoHtml = issue.photoUrl ? `<img src="${issue.photoUrl}" alt="Issue Photo">` : '';
+            const photoHtml = issue.photoUrl ? `<img src="${issue.photoUrl}" alt="Issue Photo" style="max-width: 100%; margin-bottom: 10px;">` : '';
+            const date = new Date(issue.createdAt).toLocaleDateString();
+            const badgeClass = issue.status === 'New' ? 'badge-danger' : issue.status === 'In Progress' ? 'badge-warning' : 'badge-success';
+
+            const hasUpvoted = localStorage.getItem('upvoted_' + issue._id) === 'true';
+            const upvoteBtnText = hasUpvoted ? 'Upvoted ✓' : 'Me Too!';
+            const upvoteBtnDisabled = hasUpvoted ? 'disabled' : '';
 
             const popupContent = `
-                <div class="popup-container">
-                    <div class="popup-header" style="background: ${issue.status === 'New' ? 'var(--danger)' : issue.status === 'In Progress' ? 'var(--warning)' : 'var(--success)'}">
-                        <h3>${issue.type}</h3>
+                <div style="min-width: 200px;">
+                    <h3 style="margin:0 0 5px 0; color:var(--primary)">${issue.type}</h3>
+                    <p style="margin:0 0 10px 0; font-size:14px;">${issue.description}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-size:12px; color:#666;">${date}</span>
+                        <span class="badge ${badgeClass}">${issue.status}</span>
                     </div>
-                    <div class="popup-body">
-                        ${photoHtml}
-                        <p><strong>Description:</strong> ${issue.description}</p>
-                        <p><strong>Status:</strong> ${issue.status}</p>
-                        <p><strong>Reported:</strong> ${new Date(issue.createdAt).toLocaleDateString()}</p>
+                    ${photoHtml}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                        <span style="font-weight: bold; color: var(--primary);" id="upvote-count-${issue._id}">👍 ${issue.upvotes || 0}</span>
+                        <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="upvoteIssue('${issue._id}')" id="btn-upvote-${issue._id}" ${upvoteBtnDisabled}>${upvoteBtnText}</button>
                     </div>
                 </div>
             `;
@@ -139,8 +147,32 @@ async function loadIssues() {
     }
 }
 
-// Call on load
+// Load issues when map is ready
 loadIssues();
+
+// Upvote an issue
+async function upvoteIssue(id) {
+    if (localStorage.getItem('upvoted_' + id) === 'true') return;
+
+    try {
+        const response = await fetch(`/api/issues/${id}/upvote`, {
+            method: 'PATCH'
+        });
+
+        if (response.ok) {
+            const updatedIssue = await response.json();
+            localStorage.setItem('upvoted_' + id, 'true');
+            
+            // Update UI
+            document.getElementById('upvote-count-' + id).innerText = '👍 ' + updatedIssue.upvotes;
+            const btn = document.getElementById('btn-upvote-' + id);
+            btn.innerText = 'Upvoted ✓';
+            btn.disabled = true;
+        }
+    } catch (err) {
+        console.error('Error upvoting:', err);
+    }
+}
 
 // Variable to store the temporary marker when user clicks
 let tempMarker = null;

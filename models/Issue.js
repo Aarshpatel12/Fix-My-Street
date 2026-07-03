@@ -23,8 +23,12 @@ const IssueSchema = new mongoose.Schema({
         default: 'New'
     },
     photoUrl: {
-        type: String,
-        default: ''
+        type: String, // Base64 string for simplicity in MVP
+        required: false
+    },
+    upvotes: {
+        type: Number,
+        default: 0
     },
     createdAt: {
         type: Date,

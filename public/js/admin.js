@@ -41,7 +41,14 @@ async function loadAdminIssues() {
                 <td>${dateStr}</td>
                 <td>${locationHtml}</td>
                 <td><strong>${issue.type}</strong></td>
-                <td>${issue.description}</td>
+                <td>
+                    ${issue.description}
+                    <div style="margin-top: 0.5rem;">
+                        <span style="background: #f0fdf4; color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: bold;">
+                            👍 ${issue.upvotes || 0} Upvotes
+                        </span>
+                    </div>
+                </td>
                 <td>${photoHtml}</td>
                 <td><span class="badge ${statusBadgeClass}" id="status-badge-${issue._id}">${issue.status}</span></td>
                 <td>

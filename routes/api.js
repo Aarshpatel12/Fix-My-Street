@@ -31,7 +31,7 @@ router.post('/issues', async (req, res) => {
     }
 });
 
-// PATCH (Update) an issue status (For Phase 4, but we can set it up now)
+// PATCH (Update) an issue status
 router.patch('/issues/:id', async (req, res) => {
     try {
         const issue = await Issue.findById(req.params.id);
@@ -42,6 +42,20 @@ router.patch('/issues/:id', async (req, res) => {
         res.json(updatedIssue);
     } catch (err) {
         res.status(400).json({ message: err.message });
+    }
+});
+
+// PATCH upvote an issue
+router.patch('/issues/:id/upvote', async (req, res) => {
+    try {
+        const issue = await Issue.findById(req.params.id);
+        if (!issue) return res.status(404).json({ message: 'Issue not found' });
+        
+        issue.upvotes = (issue.upvotes || 0) + 1;
+        const updatedIssue = await issue.save();
+        res.json(updatedIssue);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 });
 
