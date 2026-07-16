@@ -47,10 +47,16 @@ async function loadAdminIssues() {
             let statusBadgeClass = 'badge-danger'; // New
             if (issue.status === 'In Progress') statusBadgeClass = 'badge-warning';
             if (issue.status === 'Fixed') statusBadgeClass = 'badge-success';
+            
+            // Format road info
+            const roadNameStr = issue.roadName || 'Unknown';
+            const roadAbbrStr = issue.roadAbbr ? `(${issue.roadAbbr})` : '';
+            const roadHtml = `<div>${roadNameStr} ${roadAbbrStr}</div>`;
 
             tr.innerHTML = `
                 <td data-label="Date">${dateStr}</td>
                 <td data-label="Location">${locationHtml}</td>
+                <td data-label="Road">${roadHtml}</td>
                 <td data-label="Type"><strong>${issue.type}</strong></td>
                 <td data-label="Description">
                     ${issue.description}
@@ -143,4 +149,23 @@ async function deleteIssue(id) {
 function logoutAdmin() {
     sessionStorage.removeItem('isAdminLoggedIn');
     window.location.href = '/login.html';
+}
+
+// Export issues to Excel
+function exportExcel() {
+    const startDate = document.getElementById('exportStart').value;
+    const endDate = document.getElementById('exportEnd').value;
+
+    let url = '/api/issues/export';
+    const params = [];
+
+    if (startDate) params.push(`startDate=${startDate}`);
+    if (endDate) params.push(`endDate=${endDate}`);
+
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+
+    // Trigger download by opening URL in new tab or setting window location
+    window.location.href = url;
 }

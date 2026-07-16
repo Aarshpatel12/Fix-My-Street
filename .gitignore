@@ -1,3 +1,7 @@
 node_modules/
 .env
 .DS_Store
+
+MCL_ROADS (1).kmz
+roads.zip
+kmz_extracted/

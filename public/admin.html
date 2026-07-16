@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Fix My Street Map</title>
+    <title>Admin - Meri Sadak</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=4">
@@ -23,8 +23,26 @@
     <main class="admin-main">
         <div class="container">
             <div class="admin-header">
-                <h2>Manage Reported Issues</h2>
-                <p class="text-muted">Update the status of citizen complaints directly from this dashboard.</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <h2>Manage Reported Issues</h2>
+                        <p class="text-muted">Update the status of citizen complaints directly from this dashboard.</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="exportStart" style="font-size: 0.75rem; color: var(--text-muted);">Start Date</label>
+                            <input type="date" id="exportStart" class="form-control" style="padding: 0.25rem;">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="exportEnd" style="font-size: 0.75rem; color: var(--text-muted);">End Date</label>
+                            <input type="date" id="exportEnd" class="form-control" style="padding: 0.25rem;">
+                        </div>
+                        <button class="btn-primary" onclick="exportExcel()" style="margin-top: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export Excel
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Dashboard Stats -->
@@ -53,6 +71,7 @@
                         <tr>
                             <th>Date</th>
                             <th>Location</th>
+                            <th>Road (Abbr)</th>
                             <th>Type</th>
                             <th>Description</th>
                             <th>Photo</th>

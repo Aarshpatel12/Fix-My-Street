@@ -1,6 +1,6 @@
-# 🏙️ Fix My Street
+# 🏙️ Meri Sadak
 
-**Fix My Street** is a crowdsourced civic issue reporting platform. It empowers citizens to easily report local infrastructure problems (like potholes, broken streetlights, water leaks, and garbage) directly to city administrators using an interactive, live map.
+**Meri Sadak** is a crowdsourced civic issue reporting platform. It empowers citizens to easily report local infrastructure problems (like potholes, broken streetlights, water leaks, and garbage) directly to city administrators using an interactive, live map.
 
 ---
 

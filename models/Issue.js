@@ -30,6 +30,14 @@ const IssueSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    roadName: {
+        type: String,
+        required: false
+    },
+    roadAbbr: {
+        type: String,
+        required: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
