@@ -25,6 +25,7 @@ router.get('/issues/export', async (req, res) => {
         worksheet.columns = [
             { header: 'Date', key: 'date', width: 20 },
             { header: 'Location (Lat, Lng)', key: 'location', width: 30 },
+            { header: 'Road ID', key: 'roadId', width: 25 },
             { header: 'Road Name', key: 'roadName', width: 30 },
             { header: 'Road Abbr', key: 'roadAbbr', width: 15 },
             { header: 'Type', key: 'type', width: 20 },
@@ -37,6 +38,7 @@ router.get('/issues/export', async (req, res) => {
             worksheet.addRow({
                 date: new Date(issue.createdAt).toLocaleString(),
                 location: `${issue.lat}, ${issue.lng}`,
+                roadId: issue.roadId || 'N/A',
                 roadName: issue.roadName || 'Unknown',
                 roadAbbr: issue.roadAbbr || 'UR',
                 type: issue.type,
@@ -71,6 +73,7 @@ router.get('/issues', async (req, res) => {
 router.post('/issues', async (req, res) => {
     let roadName = null;
     let roadAbbr = null;
+    let roadId = null;
     
     try {
         const nearestRoad = await Road.findOne({
@@ -88,6 +91,7 @@ router.post('/issues', async (req, res) => {
         if (nearestRoad) {
             roadName = nearestRoad.name;
             roadAbbr = roadName.split(' ').map(w => w[0].toUpperCase()).join('');
+            roadId = nearestRoad._id.toString();
         }
     } catch (err) {
         console.error("Error finding nearest road:", err);
@@ -101,7 +105,8 @@ router.post('/issues', async (req, res) => {
         status: req.body.status || 'New',
         photoUrl: req.body.photoUrl || '',
         roadName: roadName,
-        roadAbbr: roadAbbr
+        roadAbbr: roadAbbr,
+        roadId: roadId
     });
 
     try {

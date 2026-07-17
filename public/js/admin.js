@@ -52,11 +52,13 @@ async function loadAdminIssues() {
             const roadNameStr = issue.roadName || 'Unknown';
             const roadAbbrStr = issue.roadAbbr ? `(${issue.roadAbbr})` : '';
             const roadHtml = `<div>${roadNameStr} ${roadAbbrStr}</div>`;
+            const roadIdHtml = `<span style="font-family: monospace; font-size: 0.85rem; color: var(--text-muted);">${issue.roadId || 'N/A'}</span>`;
 
             tr.innerHTML = `
                 <td data-label="Date">${dateStr}</td>
                 <td data-label="Location">${locationHtml}</td>
                 <td data-label="Road">${roadHtml}</td>
+                <td data-label="Road ID">${roadIdHtml}</td>
                 <td data-label="Type"><strong>${issue.type}</strong></td>
                 <td data-label="Description">
                     ${issue.description}
