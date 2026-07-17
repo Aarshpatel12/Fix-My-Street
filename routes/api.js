@@ -35,10 +35,14 @@ router.get('/issues/export', async (req, res) => {
         ];
 
         issues.forEach(issue => {
+            const displayRoadId = issue.roadId 
+                ? (issue.roadAbbr ? `${issue.roadAbbr}-${issue.roadId.toString().slice(-4).toUpperCase()}` : issue.roadId.toString().slice(-6).toUpperCase()) 
+                : 'N/A';
+
             worksheet.addRow({
                 date: new Date(issue.createdAt).toLocaleString(),
                 location: `${issue.lat}, ${issue.lng}`,
-                roadId: issue.roadId || 'N/A',
+                roadId: displayRoadId,
                 roadName: issue.roadName || 'Unknown',
                 roadAbbr: issue.roadAbbr || 'UR',
                 type: issue.type,

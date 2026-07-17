@@ -8,8 +8,8 @@ async function updateIssues() {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB');
 
-        const issues = await Issue.find({ roadName: { $exists: false } });
-        console.log(`Found ${issues.length} issues without roadName.`);
+        const issues = await Issue.find({ roadId: { $exists: false } });
+        console.log(`Found ${issues.length} issues without roadId.`);
 
         let updatedCount = 0;
 
@@ -30,6 +30,7 @@ async function updateIssues() {
             if (nearestRoad) {
                 issue.roadName = nearestRoad.name;
                 issue.roadAbbr = nearestRoad.name.split(' ').map(w => w[0].toUpperCase()).join('');
+                issue.roadId = nearestRoad._id.toString();
                 await issue.save();
                 updatedCount++;
                 console.log(`Updated issue ${issue._id} with road: ${issue.roadName} (${issue.roadAbbr})`);
@@ -51,6 +52,7 @@ async function updateIssues() {
                 if (fallbackRoad) {
                     issue.roadName = fallbackRoad.name;
                     issue.roadAbbr = fallbackRoad.name.split(' ').map(w => w[0].toUpperCase()).join('');
+                    issue.roadId = fallbackRoad._id.toString();
                     await issue.save();
                     updatedCount++;
                     console.log(`Updated issue ${issue._id} with road (2000m fallback): ${issue.roadName} (${issue.roadAbbr})`);
