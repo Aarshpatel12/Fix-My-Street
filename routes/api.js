@@ -73,6 +73,26 @@ router.get('/issues', async (req, res) => {
     }
 });
 
+// GET all roads (for admin viewing)
+router.get('/roads', async (req, res) => {
+    try {
+        const roads = await Road.find().sort({ name: 1 });
+        const formattedRoads = roads.map(road => {
+            const roadAbbr = road.name.split(' ').map(w => w[0].toUpperCase()).join('');
+            const shortId = `${roadAbbr}-${road._id.toString().slice(-4).toUpperCase()}`;
+            return {
+                _id: road._id,
+                name: road.name,
+                abbr: roadAbbr,
+                shortId: shortId
+            };
+        });
+        res.json(formattedRoads);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // POST a new issue
 router.post('/issues', async (req, res) => {
     let roadName = null;

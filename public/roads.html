@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roads Directory - Meri Sadak</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=4">
+    <style>
+        .search-bar {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .road-id-badge {
+            font-family: monospace;
+            background: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>Roads Directory</span>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="/admin.html" class="btn-outline" style="text-decoration: none;">Back to Admin Dashboard</a>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            <div class="admin-header">
+                <h2>All Mapped Roads (Ludhiana)</h2>
+                <p class="text-muted">A complete list of all streets in the database and their unique generated IDs.</p>
+            </div>
+
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search by Road Name or ID...">
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Road Name</th>
+                            <th>Abbreviation</th>
+                            <th>Unique Road ID</th>
+                            <th>Internal Database ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roadsTableBody">
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/roads.js"></script>
+</body>
+</html>
